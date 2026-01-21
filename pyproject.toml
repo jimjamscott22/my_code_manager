@@ -1,0 +1,15 @@
+[project]
+name = "my-code-organizer"
+version = "0.1.0"
+description = "A personal desktop app to organize coding projects"
+requires-python = ">=3.10"
+dependencies = [
+    "pygobject>=3.42.0",
+]
+
+[project.scripts]
+my-code-organizer = "my_code_organizer.main:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

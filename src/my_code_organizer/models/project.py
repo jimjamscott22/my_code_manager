@@ -1,0 +1,87 @@
+from dataclasses import dataclass
+from datetime import datetime
+from typing import List, Optional
+from pathlib import Path
+from .database import get_db
+
+@dataclass
+class Project:
+    id: Optional[int]
+    name: str
+    path: str
+    language: Optional[str] = None
+    description: Optional[str] = None
+    last_modified: Optional[datetime] = None
+    is_favorite: bool = False
+    created_at: Optional[datetime] = None
+
+    @staticmethod
+    def add(name: str, path: str, language: Optional[str] = None,
+            description: Optional[str] = None) -> 'Project':
+        """Add a new project to the database."""
+        db = get_db()
+        cursor = db.get_cursor()
+
+        # Get last modified time from filesystem
+        path_obj = Path(path)
+        last_modified = datetime.fromtimestamp(path_obj.stat().st_mtime) if path_obj.exists() else None
+
+        cursor.execute("""
+            INSERT INTO projects (name, path, language, description, last_modified)
+            VALUES (?, ?, ?, ?, ?)
+        """, (name, path, language, description, last_modified))
+
+        db.conn.commit()
+
+        project_id = cursor.lastrowid
+        return Project.get_by_id(project_id)
+
+    @staticmethod
+    def get_all() -> List['Project']:
+        """Get all projects from the database."""
+        db = get_db()
+        cursor = db.get_cursor()
+
+        cursor.execute("""
+            SELECT * FROM projects ORDER BY last_modified DESC
+        """)
+
+        projects = []
+        for row in cursor.fetchall():
+            projects.append(Project._from_row(row))
+
+        return projects
+
+    @staticmethod
+    def get_by_id(project_id: int) -> Optional['Project']:
+        """Get a project by ID."""
+        db = get_db()
+        cursor = db.get_cursor()
+
+        cursor.execute("SELECT * FROM projects WHERE id = ?", (project_id,))
+        row = cursor.fetchone()
+
+        return Project._from_row(row) if row else None
+
+    @staticmethod
+    def delete(project_id: int):
+        """Delete a project from the database."""
+        db = get_db()
+        cursor = db.get_cursor()
+
+        cursor.execute("DELETE FROM projects WHERE id = ?", (project_id,))
+        db.conn.commit()
+
+    @staticmethod
+    def _from_row(row) -> 'Project':
+        """Create a Project instance from a database row."""
+        return Project(
+            id=row['id'],
+            name=row['name'],
+            path=row['path'],
+            language=row['language'],
+            description=row['description'],
+            last_modified=datetime.fromisoformat(row['last_modified']) if row['last_modified'] else None,
+            is_favorite=bool(row['is_favorite']),
+            created_at=datetime.fromisoformat(row['created_at']) if row['created_at'] else None
+        )
