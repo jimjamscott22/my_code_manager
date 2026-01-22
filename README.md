@@ -110,7 +110,7 @@ GTK4 and Libadwaita are installed via your system package manager (pacman/apt/dn
 
 **Note:** Run these commands from the project directory (where you created the venv).
 
-**Linux/macOS/Windows (MSYS2):**
+**Linux/macOS:**
 
 ```bash
 # Navigate to project directory if not already there
@@ -122,6 +122,25 @@ source venv/bin/activate
 # Run the application
 my-code-organizer
 ```
+
+**Windows (MSYS2 MINGW64 or Git Bash):**
+
+```bash
+# Navigate to project directory if not already there
+# Example: cd /c/Users/jimja/github_repos/Python/my_code_manager
+cd /c/path/to/my_code_manager
+
+# Activate venv
+source venv/bin/activate
+
+# Run the application
+my-code-organizer
+```
+
+**Important for Windows users:**
+
+- You must use MSYS2 MINGW64 or Git Bash terminal (not CMD or PowerShell)
+- This is required because GTK4 libraries are installed via MSYS2
 
 ## Development
 
