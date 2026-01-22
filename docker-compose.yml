@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  my-code-organizer:
+    build: .
+    image: my-code-organizer:latest
+    container_name: my-code-organizer
+    network_mode: host
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+    volumes:
+      # X11 socket for GUI
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # Persist application data
+      - my-code-organizer-data:/root/.local/share/my-code-organizer
+      # Optional: Mount your projects directory (adjust path as needed)
+      # - /path/to/your/projects:/projects:ro
+    stdin_open: true
+    tty: true
+
+volumes:
+  my-code-organizer-data:

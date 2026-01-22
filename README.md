@@ -106,7 +106,42 @@ pip install -r requirements-dev.txt
 **Why `--system-site-packages`?**
 GTK4 and Libadwaita are installed via your system package manager (pacman/apt/dnf) and cannot be installed via pip. The `--system-site-packages` flag allows your virtual environment to access these system-installed packages while keeping other Python dependencies isolated.
 
-## Running
+## Running with Docker
+
+**Linux only** (GUI applications in Docker require X11 forwarding, which works best on Linux):
+
+```bash
+# Allow Docker to access X server
+xhost +local:docker
+
+# Build and run with docker-compose
+docker-compose up --build
+
+# When done, revoke X server access
+xhost -local:docker
+```
+
+Or using Docker directly:
+
+```bash
+# Build the image
+docker build -t my-code-organizer .
+
+# Run the container
+xhost +local:docker
+docker run -it --rm \
+  -e DISPLAY=$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -v my-code-organizer-data:/root/.local/share/my-code-organizer \
+  my-code-organizer
+
+# Revoke X server access when done
+xhost -local:docker
+```
+
+**Note:** Docker GUI applications on Windows/macOS require additional X server setup (like VcXsrv or XQuartz) and are not officially supported.
+
+## Running Natively
 
 **Note:** Run these commands from the project directory (where you created the venv).
 
